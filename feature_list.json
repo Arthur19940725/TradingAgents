@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "id": "harness-001",
+      "name": "Repository agent harness",
+      "description": "Provide repository instructions, restartable state, a verification entry point, and a session handoff for future coding-agent work.",
+      "dependencies": [],
+      "status": "completed",
+      "done_criteria": [
+        "CLAUDE.md routes startup, scope, verification, and end-of-session work",
+        "feature_list.json and progress.md record current state and evidence",
+        "init.sh runs the repository's CI-equivalent unit checks",
+        "session-handoff.md gives the next session an exact restart path",
+        "The harness validator reports no missing subsystem"
+      ],
+      "evidence": "Harness validator: 100/100, all five subsystems 5/5. bash -n init.sh: passed. python -m ruff check .: passed. git diff --check: passed. ./init.sh reached pytest but full collection is blocked because the available Python 3.14 environment lacks project dependencies; the checked-in .venv references missing C:\\Python313\\python.exe."
+    }
+  ]
+}
