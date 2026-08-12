@@ -1,0 +1,4 @@
+interface:
+  display_name: "TradingAgents"
+  short_description: "TradingAgents repo workflow guide"
+  default_prompt: "Use $tradingagents to run, configure, or maintain the TradingAgents repository."
