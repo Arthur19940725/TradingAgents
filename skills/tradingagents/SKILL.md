@@ -12,9 +12,12 @@ Treat TradingAgents as a research framework, not financial advice. Preserve exac
 ## First Checks
 
 1. Confirm the working directory is the TradingAgents repository.
-2. Read `README.md`, `pyproject.toml`, and the directly relevant files before editing.
-3. Check `git status --short --branch` and preserve user changes.
-4. For runtime or data questions, identify the entry point first:
+2. Read `CLAUDE.md`, `feature_list.json`, and `progress.md` before editing; they define the active scope and restart state.
+3. Read `README.md`, `pyproject.toml`, and the directly relevant files before editing.
+4. Check `git status --short --branch` and preserve user changes.
+5. Before production-code changes, run `./init.sh` for a baseline. If the environment blocks it, record the exact failure and use the narrowest meaningful check instead.
+6. Keep exactly one repository feature active. Do not mix unrelated cleanup or refactors into the requested change.
+7. For runtime or data questions, identify the entry point first:
    - CLI: `cli/main.py`, `cli/utils.py`
    - Programmatic API: `tradingagents/graph/trading_graph.py`
    - Defaults/env: `tradingagents/default_config.py`
@@ -95,13 +98,15 @@ ta.save_reports(state, "NVDA")
 
 1. Search existing tests before changing behavior.
 2. Make the smallest change in the nearest active module.
-3. Add or update focused tests for config precedence, provider routing, ticker identity, stale-data guards, checkpoints, or CLI behavior when touched.
-4. Update `CHANGELOG.md` only for user-visible release notes or when the user requests it.
-5. Keep reports and generated runtime output out of source changes unless explicitly requested.
+3. If a change touches graph inputs, callbacks, initial state, or stream merging, compare the CLI path in `cli/main.py` with `TradingAgentsGraph._run_graph()` and preserve their behavior parity.
+4. Preserve compatibility contracts: literal `AgentState` and debate-state keys, Markdown headings such as `**Rating**`, `**Recommendation**`, and `**Action**`, and the shared numbered report layout.
+5. Add or update focused tests for config precedence, provider routing, ticker identity, stale-data guards, checkpoints, or CLI behavior when touched.
+6. Update `CHANGELOG.md` only for user-visible release notes or when the user requests it.
+7. Keep reports and generated runtime output out of source changes unless explicitly requested.
 
 ## Verification
 
-Read `pyproject.toml` before choosing commands. Prefer focused tests first, then broader checks if the change affects shared behavior.
+Read `pyproject.toml` before choosing commands. Prefer focused tests first, then broader checks if the change affects shared behavior. For a substantive coding task, finish by updating the active entry in `feature_list.json` and `progress.md` with the exact checks and results; update `session-handoff.md` when work will continue in another session.
 
 Typical checks:
 
@@ -113,7 +118,20 @@ python -m ruff check .
 python -c "import tradingagents, cli.main; print('clean-install import OK')"
 ```
 
+For repository-local skill maintenance, run `python skills/tradingagents/scripts/validate_skill.py` to verify frontmatter, lifecycle references, eval shape, and current CLI syntax.
+
 If dependencies, lockfiles, security-sensitive config, or provider auth handling changes, run the ecosystem-appropriate non-mutating audit when available and report the result.
+
+## Response Contract
+
+For every substantive diagnosis or code change, report the result first, then:
+
+- files inspected and changed;
+- verification commands and their outcomes;
+- skipped checks and the reason (especially missing dependencies or credentials);
+- blockers and remaining uncertainty.
+
+Distinguish facts confirmed from source/tests, assumptions, and live-provider observations. Do not present an unverified market value, provider capability, or successful test run as fact.
 
 ## References
 
