@@ -2,58 +2,43 @@
 
 ## Current State
 
-- **Last Updated:** 2026-08-12
-- **Active Feature:** `harness-001` — Repository agent harness
-- **Status:** Completed; full pytest remains an environment blocker, not a harness implementation failure.
-- **Current Objective:** Add the smallest restartable agent harness around the existing repository-specific `CLAUDE.md`.
+- **Last Updated:** 2026-08-13
+- **Active Feature:** `skill-002` — TradingAgents skill hardening
+- **Status:** Completed; static and behavioral skill checks passed. Full repository pytest remains an environment blocker.
+- **Current Objective:** Make the repository-local TradingAgents skill follow the checked-in harness lifecycle and provide repeatable validation for its evals and contracts.
 
 ## What's Done
 
-- Analyzed project commands, architecture, and cross-file contracts.
-- Created the repository-specific `CLAUDE.md` without generic contributor guidance.
-- Added startup, scope, definition-of-done, and end-of-session routing.
-- Added the feature tracker, progress log, verification entry point, and handoff file.
-- Ran the structural harness validator successfully at 100/100.
+- Audited the existing skill, repository instructions, feature state, and GitHub remotes.
+- Added lifecycle guidance to `skills/tradingagents/SKILL.md`: read `feature_list.json`/`progress.md`, run `./init.sh` before production-code changes, keep one feature active, and update restart state at the end.
+- Added explicit CLI/library parity and report-contract safeguards for graph state, streaming, Markdown headings, and numbered report layout.
+- Added a response contract requiring result-first reporting, touched files, verification outcomes, skipped checks, blockers, and uncertainty.
+- Expanded `skills/tradingagents/evals/evals.json` from three to five cases and added machine-checkable `assertions` to every case.
+- Added `skills/tradingagents/scripts/validate_skill.py` to validate skill frontmatter, references, current CLI syntax, lifecycle references, eval shape, and unique IDs.
+- Corrected the stale checkpoint command examples in `README.md` to use the current single-command Typer form.
+- Ran five independent behavioral evaluations; all 20 assertions passed.
 
 ## What's In Progress
 
-- None. The harness work is complete.
-
-## What's Next
-
-1. Recreate the broken `.venv` with Python 3.10–3.13, or select an existing supported interpreter.
-2. Run `python -m pip install -e ".[dev]"`.
-3. Run `./init.sh` and replace the current pytest blocker with full test evidence.
+- None for implementation. Commit and push the completed skill hardening change to `origin/codex/tradingagents-skill`.
 
 ## Blockers / Risks
 
-- The current system Python is 3.14.5 and lacks project dependencies, so pytest fails during collection with missing `yfinance`, `langchain_anthropic`, `typer`, `questionary`, and related packages.
-- The checked-in `.venv` points to missing `C:\Python313\python.exe` and cannot be executed.
-
-## Decisions Made
-
-- Keep `CLAUDE.md` as the instruction authority rather than adding a competing `AGENTS.md`.
-- Keep `feature_list.json` limited to concrete active repository work rather than inventing a product roadmap.
-- Make `init.sh` run the same two checks as CI: `pytest -q` and `ruff check .`.
-- Let `init.sh` enforce the declared `pyproject.toml` minimum of Python 3.10 or newer, while documenting the CI-supported 3.10–3.13 matrix separately.
-
-## Files Modified This Session
-
-- `CLAUDE.md` — repository commands, architecture, startup, scope, and lifecycle guidance.
-- `feature_list.json` — completed harness feature and evidence.
-- `progress.md` — restartable state and verification evidence.
-- `init.sh` — standard verification entry point.
-- `session-handoff.md` — exact next-session restart path.
+- `./init.sh` reaches pytest but full collection is blocked by the available Python 3.14.5 environment missing project dependencies including `yfinance`, `langchain_anthropic`, `typer`, and `questionary`.
+- The checked-in `.venv` points to missing `C:\Python313\python.exe` and cannot be used for full verification.
+- No live provider or credentialed analysis is part of this skill change; those checks were intentionally skipped.
 
 ## Verification Evidence
 
-- Harness validator: `node C:/Users/Administrator/.claude/skills/harness-creator/scripts/validate-harness.mjs --target . --json` — **100/100**, all five subsystems 5/5.
-- Shell syntax: `bash -n init.sh` — passed.
-- Lint: `python -m ruff check .` — passed.
-- Whitespace: `git diff --check` — passed.
-- Bootstrap: `./init.sh` — reached pytest; pytest collection is blocked by missing project dependencies in system Python.
-- Single-test collection: `python -m pytest --collect-only -q tests/test_api_key_env.py::test_ollama_has_no_key` — collected one test under system Python.
+- Five behavioral evals — **20/20 assertions passed**: checkpoint deletion safety, no-console diagnosis, ticker/data integrity, provider configuration safety, and CLI/library/report parity.
+- `python skills/tradingagents/scripts/validate_skill.py` — passed; 5 evals validated.
+- `python -m json.tool skills/tradingagents/evals/evals.json` — passed.
+- `python C:/Users/Administrator/.claude/skills/skill-creator/scripts/quick_validate.py D:/code/TradingAgents/skills/tradingagents` — passed (`Skill is valid!`).
+- `bash -n init.sh` — passed.
+- `python -m ruff check .` — passed.
+- `git diff --check` — passed.
+- `./init.sh` — blocked during pytest collection by missing dependencies in system Python; no code failure was inferred.
 
-## Notes for Next Session
+## Next Action
 
-Read `CLAUDE.md`, `feature_list.json`, and this file first. The next useful action is environment repair, not production-code changes. Do not change production code merely to accommodate Python 3.14.
+Inspect the staged diff and commit this completed feature, then push explicitly to the `origin` remote. Verify the remote branch and PR URL after the push.
