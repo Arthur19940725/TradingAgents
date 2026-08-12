@@ -24,17 +24,27 @@ Treat TradingAgents as a research framework, not financial advice. Preserve exac
 
 ## Run Workflow
 
-Use the narrowest command that matches the task:
+Before a live analysis, confirm the ticker, analysis date, asset type, provider and models,
+output language, expected API/data costs, and allowed output locations. Live runs can call
+external LLM and market-data services and persist reports, caches, checkpoints, and a decision
+memory log; do not start one from an ambiguous request.
+
+Use Python 3.10-3.13, matching the repository CI matrix. Verify the selected interpreter and
+installed dependencies before treating a runtime failure as a code defect. Use the narrowest
+command that matches the task:
 
 ```powershell
 python -m cli.main
-tradingagents analyze
-tradingagents analyze --checkpoint
-tradingagents analyze --clear-checkpoints
-pytest tests/test_symbol_utils.py
-pytest tests/test_market_data_validator.py
-ruff check .
+tradingagents
+tradingagents --checkpoint
+python -m pytest -q tests/test_symbol_utils.py
+python -m pytest -q tests/test_market_data_validator.py
+python -m ruff check .
 ```
+
+The CLI is interactive and needs a real Windows Terminal, PowerShell, or `cmd.exe` console.
+Do not work around a missing console by launching a credentialed analysis through another entry
+point unless the user authorized that run.
 
 For programmatic analysis, use `TradingAgentsGraph` with a copied config:
 
@@ -56,10 +66,22 @@ ta.save_reports(state, "NVDA")
 
 - Prefer `DEFAULT_CONFIG.copy()` before changing run settings.
 - Use `TRADINGAGENTS_*` environment variables for unattended runs when the repo already exposes one.
-- Do not hardcode API keys. Use the documented provider env vars from `README.md`.
+- Do not read, echo, hardcode, or commit API keys. Let the user control credential entry and use
+  the established environment or `.env` mechanism without exposing its values.
 - Keep `backend_url` provider-specific. Avoid carrying one provider's URL into another provider.
 - Treat `checkpoint_enabled`, debate round counts, and vendor routing as deterministic config, not model judgment.
 - For local or OpenAI-compatible endpoints, preserve the explicit `openai_compatible` provider path.
+
+## Persistence And Recovery
+
+- Expect completed runs to append to the decision memory log. By default, runtime logs, cache,
+  checkpoints, and memory live under `~/.tradingagents`; read `DEFAULT_CONFIG` and active
+  `TRADINGAGENTS_*` overrides before reporting an exact path.
+- Enable `--checkpoint` only when resume state is wanted. Preserve the ticker, date, analyst
+  selection, debate/risk depth, and asset type when diagnosing compatibility.
+- Treat `--clear-checkpoints` as deletion: resolve the active cache directory, show the exact
+  target and checkpoint count when possible, and require explicit user authorization before
+  running `tradingagents --clear-checkpoints` or calling the clear helper.
 
 ## Market Data And Tickers
 
@@ -84,10 +106,10 @@ Read `pyproject.toml` before choosing commands. Prefer focused tests first, then
 Typical checks:
 
 ```powershell
-pytest tests/test_symbol_utils.py tests/test_ticker_symbol_handling.py
-pytest tests/test_cli_config_precedence.py tests/test_env_overrides.py
-pytest tests/test_provider_registry.py tests/test_vendor_routing.py
-ruff check .
+python -m pytest -q tests/test_symbol_utils.py tests/test_ticker_symbol_handling.py
+python -m pytest -q tests/test_cli_config_precedence.py tests/test_env_overrides.py
+python -m pytest -q tests/test_provider_registry.py tests/test_vendor_routing.py
+python -m ruff check .
 python -c "import tradingagents, cli.main; print('clean-install import OK')"
 ```
 
