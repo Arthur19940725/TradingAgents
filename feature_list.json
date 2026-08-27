@@ -14,6 +14,21 @@
         "The harness validator reports no missing subsystem"
       ],
       "evidence": "Harness validator: 100/100, all five subsystems 5/5. bash -n init.sh: passed. python -m ruff check .: passed. git diff --check: passed. ./init.sh reached pytest but full collection is blocked because the available Python 3.14 environment lacks project dependencies; the checked-in .venv references missing C:\\Python313\\python.exe."
+    },
+    {
+      "id": "skill-002",
+      "name": "TradingAgents skill hardening",
+      "description": "Improve the repository-local TradingAgents skill with lifecycle guidance, compatibility safeguards, executable eval coverage, and static validation.",
+      "dependencies": ["harness-001"],
+      "status": "completed",
+      "done_criteria": [
+        "SKILL.md routes repository startup, one-feature scope, parity/contract checks, and end-of-session evidence",
+        "The skill includes a substantive response contract distinguishing facts, assumptions, skipped checks, and blockers",
+        "evals/evals.json contains five focused cases with human expectations and machine-checkable assertions",
+        "scripts/validate_skill.py validates frontmatter, references, current CLI syntax, lifecycle guidance, and eval structure",
+        "Skill and repository static checks pass; environment-blocked tests are recorded explicitly"
+      ],
+      "evidence": "Five independent behavioral evals passed 20/20 assertions. python skills/tradingagents/scripts/validate_skill.py: passed (5 evals). python -m json.tool skills/tradingagents/evals/evals.json: passed. Skill Creator quick_validate.py: passed. bash -n init.sh: passed. python -m ruff check .: passed. git diff --check: passed. ./init.sh reached pytest but collection is blocked by Python 3.14.5 missing project dependencies including yfinance, langchain_anthropic, typer, and questionary; no live provider or credentialed analysis was run."
     }
   ]
 }
